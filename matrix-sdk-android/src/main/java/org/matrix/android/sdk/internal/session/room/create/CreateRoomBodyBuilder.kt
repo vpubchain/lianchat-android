@@ -17,16 +17,10 @@
 package org.matrix.android.sdk.internal.session.room.create
 
 import org.matrix.android.sdk.api.extensions.tryOrNull
-import org.matrix.android.sdk.api.session.crypto.crosssigning.CrossSigningService
 import org.matrix.android.sdk.api.session.events.model.Event
 import org.matrix.android.sdk.api.session.events.model.EventType
-import org.matrix.android.sdk.api.session.events.model.toContent
 import org.matrix.android.sdk.api.session.identity.IdentityServiceError
 import org.matrix.android.sdk.api.session.identity.toMedium
-import org.matrix.android.sdk.api.session.room.model.GuestAccess
-import org.matrix.android.sdk.api.session.room.model.RoomHistoryVisibility
-import org.matrix.android.sdk.api.session.room.model.RoomJoinRules
-import org.matrix.android.sdk.api.session.room.model.RoomJoinRulesContent
 import org.matrix.android.sdk.api.session.room.model.create.CreateRoomParams
 import org.matrix.android.sdk.api.util.MimeTypes
 import org.matrix.android.sdk.internal.crypto.DeviceListManager
@@ -45,7 +39,6 @@ import javax.inject.Inject
 
 internal class CreateRoomBodyBuilder @Inject constructor(
         private val ensureIdentityTokenTask: EnsureIdentityTokenTask,
-        private val crossSigningService: CrossSigningService,
         private val deviceListManager: DeviceListManager,
         private val identityStore: IdentityStore,
         private val fileUploader: FileUploader,
@@ -76,18 +69,35 @@ internal class CreateRoomBodyBuilder @Inject constructor(
                     }
                 }
 
-        if (params.joinRuleRestricted != null) {
-            params.roomVersion = "org.matrix.msc3083"
-            params.historyVisibility = params.historyVisibility ?: RoomHistoryVisibility.SHARED
-            params.guestAccess = params.guestAccess ?: GuestAccess.Forbidden
-        }
-        val initialStates = listOfNotNull(
-                buildEncryptionWithAlgorithmEvent(params),
-                buildHistoryVisibilityEvent(params),
-                buildAvatarEvent(params),
-                buildGuestAccess(params),
-                buildJoinRulesRestricted(params)
-        )
+//        val feature = params.feature
+//        if (params.roomVersion == null && feature != null) {
+//            // a feature is requested try to take correct room version
+//            when(homeServerCapabilities.isFeatureSupported((feature))) {
+//                HomeServerCapabilities.RoomCapabilitySupport.SUPPORTED,
+//                HomeServerCapabilities.RoomCapabilitySupport.SUPPORTED_UNSTABLE -> {
+//                    params.roomVersion = homeServerCapabilities.versionOverrideForFeature(feature)
+//                }
+//                else -> {
+//                    Timber.w("## Create Room: Can't find compatible version for this feature: $feature")
+//                }
+//            }
+//        }
+//
+        params.featurePreset?.updateRoomParams(params)
+//
+//        if (params. != null) {
+//            params.historyVisibility = params.historyVisibility ?: RoomHistoryVisibility.SHARED
+//            params.guestAccess = params.guestAccess ?: GuestAccess.Forbidden
+//        }
+        val initialStates = (
+                listOfNotNull(
+                        buildEncryptionWithAlgorithmEvent(params),
+                        buildHistoryVisibilityEvent(params),
+                        buildAvatarEvent(params),
+                        buildGuestAccess(params)
+                )
+                        + params.featurePreset?.setupInitialStates().orEmpty()
+                )
                 .takeIf { it.isNotEmpty() }
 
         return CreateRoomBody(
@@ -148,19 +158,19 @@ internal class CreateRoomBodyBuilder @Inject constructor(
                 }
     }
 
-    private fun buildJoinRulesRestricted(params: CreateRoomParams): Event? {
-        return params.joinRuleRestricted
-                ?.let { allowList ->
-                    Event(
-                            type = EventType.STATE_ROOM_JOIN_RULES,
-                            stateKey = "",
-                            content = RoomJoinRulesContent(
-                                    _joinRules = RoomJoinRules.RESTRICTED.value,
-                                    allowList = allowList
-                            ).toContent()
-                    )
-                }
-    }
+//    private fun buildJoinRulesRestricted(params: CreateRoomParams): Event? {
+//        return params.joinRuleRestricted
+//                ?.let { allowList ->
+//                    Event(
+//                            type = EventType.STATE_ROOM_JOIN_RULES,
+//                            stateKey = "",
+//                            content = RoomJoinRulesContent(
+//                                    _joinRules = RoomJoinRules.RESTRICTED.value,
+//                                    allowList = allowList
+//                            ).toContent()
+//                    )
+//                }
+//    }
 
     /**
      * Add the crypto algorithm to the room creation parameters.
