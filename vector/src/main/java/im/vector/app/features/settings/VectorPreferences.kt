@@ -153,6 +153,7 @@ class VectorPreferences @Inject constructor(private val context: Context) {
         const val SETTINGS_LABS_ALLOW_EXTENDED_LOGS = "SETTINGS_LABS_ALLOW_EXTENDED_LOGS"
         const val SETTINGS_LABS_USE_RESTRICTED_JOIN_RULE = "SETTINGS_LABS_USE_RESTRICTED_JOIN_RULE"
         const val SETTINGS_LABS_SPACES_HOME_AS_ORPHAN = "SETTINGS_LABS_SPACES_HOME_AS_ORPHAN"
+        const val SETTINGS_PREF_SPACE_SHOW_ALL_ROOM_IN_HOME = "SETTINGS_PREF_SPACE_SHOW_ALL_ROOM_IN_HOME"
 
         const val SETTINGS_LABS_VOICE_MESSAGE = "SETTINGS_LABS_VOICE_MESSAGE"
 
@@ -973,8 +974,14 @@ class VectorPreferences @Inject constructor(private val context: Context) {
         return defaultPrefs.getBoolean(SETTINGS_LABS_USE_RESTRICTED_JOIN_RULE, false)
     }
 
-    fun labsSpacesOnlyOrphansInHome(): Boolean {
+    private fun labsSpacesOnlyOrphansInHome(): Boolean {
         return defaultPrefs.getBoolean(SETTINGS_LABS_SPACES_HOME_AS_ORPHAN, false)
+    }
+
+    fun prefSpacesShowAllRoomInHome(): Boolean {
+        return defaultPrefs.getBoolean(SETTINGS_PREF_SPACE_SHOW_ALL_ROOM_IN_HOME,
+                // migration of old property
+                !labsSpacesOnlyOrphansInHome())
     }
 
     /*
