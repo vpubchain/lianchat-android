@@ -58,7 +58,7 @@
         android:title="@string/labs_space_show_orphan_in_home"/>
 
     <im.vector.app.core.preference.VectorSwitchPreference
-        android:defaultValue="false"
+        android:defaultValue="true"
         android:key="SETTINGS_LABS_VOICE_MESSAGE"
         android:title="@string/labs_use_voice_message"/>
 

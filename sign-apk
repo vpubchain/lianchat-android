@@ -1,0 +1,10 @@
+#!/bin/bash
+
+userpath=./vector/build/outputs/apk/gplay/release
+echo $userpath
+
+#/opt/jdk-11.0.8/bin/jarsigner -verbose -keystore  it-homer.keystore -signedjar $userpath/vector-gplay-arm64-v8a-release-signed.apk $userpath/vector-gplay-arm64-v8a-release-unsigned.apk it-homer.keystore
+#/opt/jdk-11.0.8/bin/jarsigner -verbose -keystore  it-homer.keystore -signedjar $userpath/vector-gplay-armeabi-v7a-release-signed.apk $userpath/vector-gplay-armeabi-v7a-release-unsigned.apk it-homer.keystore
+#/opt/jdk-11.0.8/bin/jarsigner -verbose -keystore  it-homer.keystore -signedjar $userpath/vector-gplay-universal-release-signed.apk $userpath/vector-gplay-universal-release-unsigned.apk it-homer.keystore
+/opt/jdk-11.0.8/bin/jarsigner -verbose -keystore  it-homer.keystore -signedjar $userpath/vector-gplay-x86_64-release-signed.apk $userpath/vector-gplay-x86_64-release-unsigned.apk it-homer.keystore
+/opt/jdk-11.0.8/bin/jarsigner -verbose -keystore  it-homer.keystore -signedjar $userpath/vector-gplay-x86-release-signed.apk $userpath/vector-gplay-x86-release-unsigned.apk it-homer.keystore 
